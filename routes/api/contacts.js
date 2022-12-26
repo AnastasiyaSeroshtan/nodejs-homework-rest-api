@@ -1,60 +1,18 @@
 const express = require('express')
-const contacts = require('../../models/contacts')
-const { HttpError } = require('../../helpers')
-
+const ctrl = require("../../controllers/contacts")
+const {ctrlWrapper} = require('../../helpers')
+const { validateBody } = require('../../middlewares')
+const schemas = require('../../schemas/contacts')
 const router = express.Router()
 
-router.get('/', async (req, res, next) => {
-try {
-  const allContatcts = await contacts.listContacts();
-  res.json(allContatcts)
-  } 
-  catch (error) {
-    next(error)
-  // res.status(500).json({
-  //   message: 'Server error'
-  // })
-}
-})
+router.get('/', ctrlWrapper(ctrl.listContacts))
 
-router.get('/:contactId', async (req, res, next) => {
-  try {
-    const id = req.params.contactId;
-    console.log(id);
-    const contactById = await contacts.getContactById(id);
+router.get('/:contactId', ctrlWrapper(ctrl.getContactById))
 
-    if (!contactById) {
-      throw HttpError(404, 'Not found')
-      // const error = new Error('Not found');
-      // error.status = 404;
-      // throw error;
+router.post('/', validateBody(schemas.addNewContactSchema),  ctrlWrapper(ctrl.addContact))
 
-      // return res.status(404).json({
-      //   message: 'Not found'
-      // })
-    };
+router.delete('/:contactId', ctrlWrapper(ctrl.removeContact))
 
-    res.json(contactById)
-    } 
-    catch (error) {
-      next(error)
-      // const {status = 500, message = 'Server error'} = error;
-      // res.status(status).json({
-      //   message,
-      // })
-  }
-})
-
-router.post('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
-
-router.delete('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
-
-router.put('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.put('/:contactId', validateBody(schemas.addNewContactSchema), ctrlWrapper(ctrl.updateContact))
 
 module.exports = router
