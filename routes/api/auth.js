@@ -3,11 +3,15 @@ const {auth: authCtrl} = require('../../controllers')
 const router = express.Router()
 const {ctrlWrapper} = require('../../helpers')
 const { validateBody, authenticate, upload} = require('../../middlewares')
-const schemas = require('../../schemas/users')
+const {users} = require('../../schemas')
 
-router.post('/signup', validateBody(schemas.signupSchema), ctrlWrapper(authCtrl.signup))
+router.post('/signup', validateBody(users.signupSchema), ctrlWrapper(authCtrl.signup))
 
-router.post('/login', validateBody(schemas.loginSchema), ctrlWrapper(authCtrl.login))
+router.get('/verify/:verificationToken', ctrlWrapper(authCtrl.verify))
+
+router.post('/verify', validateBody(users.emailSchema), ctrlWrapper(authCtrl.reVerifyEmail))
+
+router.post('/login', validateBody(users.loginSchema), ctrlWrapper(authCtrl.login))
 
 router.post('/logout', authenticate, ctrlWrapper(authCtrl.logout))
 
